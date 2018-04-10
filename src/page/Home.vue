@@ -7,12 +7,12 @@
             <list-content @listen="getTickList" class="left_content"></list-content>
           </el-col>
           <el-col :span="17">
-            <time-tick :list="list" @clearlist="clearlist" class="right_top_content"></time-tick>
+            <time-tick :list="list" :initialConfig="initialConfig" @clearlist="clearlist" class="right_top_content"></time-tick>
             <count-back class="right_bot_content"></count-back>
           </el-col>
         </el-row>
       </div>
-      <config-info :configTrigger="configTrigger" @closeConfig="closeConfig" @confirmConfig="confirmConfig"></config-info>
+      <config-info :configTrigger="configTrigger" :initialConfig="initialConfig" @closeConfig="closeConfig" @confirmConfig="confirmConfig"></config-info>
   </div>
 </template>
 
@@ -27,8 +27,12 @@ export default {
   data () {
     return {
       configTrigger: false,
+      initialConfig: {},
       list: {}
     }
+  },
+  created () {
+    this.getInitialConfig()
   },
   methods: {
     openConfig () {
@@ -36,6 +40,21 @@ export default {
     },
     closeConfig () {
       this.configTrigger = false
+    },
+    getInitialConfig () {
+      this.$http({
+        method: 'POST',
+        url: '/api/config'
+      }).then((res) => {
+        if (res.data.status === true) {
+          this.initialConfig = res.data.data
+        } else {
+          this.$message({
+            message: '初始化时间失败，请重新刷新页面',
+            type: 'warning'
+          })
+        }
+      })
     },
     // 确认配置，发送配置保存请求
     confirmConfig (configInfo) {
@@ -50,6 +69,7 @@ export default {
             type: 'success'
           })
           this.configTrigger = false
+          this.getInitialConfig()
         } else {
           this.$message({
             message: '新增配置失败，请重试',

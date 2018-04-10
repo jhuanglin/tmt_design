@@ -35,7 +35,8 @@
 <script>
 export default {
   props: {
-    configTrigger: Boolean
+    configTrigger: Boolean,
+    initialConfig: Object
   },
   data () {
     return {
@@ -71,6 +72,10 @@ export default {
   watch: {
     configTrigger (val) {
       this.diaVis = val
+    },
+    initialConfig (val) {
+      // console.log(val)
+      this.configInfo = val
     }
   }
   // computed: {

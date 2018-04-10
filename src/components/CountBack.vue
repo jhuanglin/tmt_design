@@ -35,7 +35,10 @@
           <el-date-picker :editable="false" v-model="countPromoDate" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd" size="small" @change="getPromoData" :picker-options="pickerOptions"></el-date-picker>
         </div>
         <div class="promo_content">
-          <div v-for="(data, index) in promoShowData" :key="index" class="completed_promo">
+          <p v-if="promoShowData.length === 0" class="content_none_data">
+            暂无数据~fighting！
+          </p>
+          <div v-else v-for="(data, index) in promoShowData" :key="index" class="completed_promo">
             <completed-promo :promoData="data" @reloadPro="reloadPro"></completed-promo>
           </div>
         </div>
@@ -46,6 +49,9 @@
           <el-date-picker :editable="false" v-model="countListDate" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd" size="small" @change="getListData" :picker-options="pickerOptions"></el-date-picker>
         </div>
         <div class="promo_content">
+          <p v-if="listShowData.length === 0" class="content_none_data">
+            暂无数据~fighting！
+          </p>
           <div v-for="(data, index) in listShowData" :key="index" class="completed_list">
             <completed-list :listData="data" @reloadList="reloadProList"></completed-list>
           </div>
@@ -65,9 +71,9 @@ export default {
   data () {
     return {
       type: '',
-      historyCountMins: 100,
-      historyCountPromos: 11,
-      historyCountList: 10,
+      historyCountMins: 0,
+      historyCountPromos: 0,
+      historyCountList: 0,
       allMins: 0,
       countDate: [],
       countPromoDate: [],
@@ -93,19 +99,46 @@ export default {
     }
   },
   created () {
+    this.getCountData()
+    this.$eventBus.$on('reloadCountData', () => {
+      this.getCountData()
+      let type = this.type
+      if (type === 'historyList') {
+        this.getListData()
+      } else if (type === 'historyPromo') {
+        this.getPromoData()
+      } else if (type === 'historyMins') {
+        this.getChartLineData()
+        this.getChartData()
+      }
+    })
     // this.getChartLineData()
     // this.getChartData()
-    // this.getPromoData()
     // this.getListData()
   },
   methods: {
+    // 获取一开始的初始统计数据
+    getCountData () {
+      this.$http({
+        method: 'POST',
+        url: '/api/count/data'
+      }).then((res) => {
+        if (res.data.status === true) {
+          let data = res.data.data
+          console.log(data)
+          this.historyCountMins = data.historyCountMins
+          this.historyCountPromos = data.historyCountPromos
+          this.historyCountList = data.historyCountList
+        }
+      })
+    },
     // 默认展示七天数据
-    getChartLineData () {
+    getChartLineData (val) {
       var data = {
         start_date: '',
         end_date: ''
       }
-      if (this.countDate.length === 2) {
+      if (val && this.countDate.length === 2) {
         data.start_date = this.countDate[0]
         data.end_date = this.countDate[1]
       }
@@ -148,12 +181,12 @@ export default {
       })
     },
     // 获取完成番茄的历史
-    getPromoData () {
+    getPromoData (val) {
       var data = {
         start_date: '',
         end_date: ''
       }
-      if (this.countPromoDate.length === 2) {
+      if (val && this.countPromoDate.length === 2) {
         data.start_date = this.countPromoDate[0]
         data.end_date = this.countPromoDate[1]
       }
@@ -170,12 +203,12 @@ export default {
         }
       })
     },
-    getListData () {
+    getListData (val) {
       var data = {
         start_date: '',
         end_date: ''
       }
-      if (this.countListDate.length === 2) {
+      if (val && this.countListDate.length === 2) {
         data.start_date = this.countListDate[0]
         data.end_date = this.countListDate[1]
       }
@@ -200,30 +233,38 @@ export default {
           if (this.chartLoading) {
             this.getChartLineData()
             this.getChartData()
+            this.listLoading = true
+            this.promoLoading = true
           }
           break
         case 'historyList':
           if (this.listLoading) {
             this.getListData()
+            this.chartLoading = true
+            this.promoLoading = true
           }
           break
         case 'historyPromo':
           if (this.promoLoading) {
             this.getPromoData()
+            this.chartLoading = true
+            this.listLoading = true
           }
           break
       }
     },
     // 日期搜索
     dateSearch (val) {
-      this.getChartLineData()
+      this.getChartLineData(val)
     },
-    // 删除之后重新加载list
+    // 删除之后重新加载promo
     reloadPro () {
       this.getPromoData()
+      this.getCountData()
     },
     reloadProList () {
       this.getListData()
+      this.$eventBus.$emit('delCompleteList')
     },
     // 切换页面
     handleCurrentChange (val) {
@@ -290,6 +331,15 @@ export default {
       &:last-child{
         border-bottom: 0px;
       }
+    }
+
+    .content_none_data{
+      padding-top: 30px;
+      padding-bottom: 30px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #F84F62;
     }
   }
 }

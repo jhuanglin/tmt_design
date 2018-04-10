@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import md5 from 'md5'
 import '@/assets/login_regis.scss'
 
 export default {
@@ -63,14 +64,15 @@ export default {
             url: '/api/login',
             data: {
               username: this.userInfo.username,
-              password: this.userInfo.password
+              password: md5(this.userInfo.password)
             }
           }).then((res) => {
+            console.log(res)
             if (res.data.status === true) {
               localStorage.setItem('username', this.userInfo.username)
               this.$router.push('/tmt_home')
             } else {
-              var errCode = res.err_code
+              var errCode = res.data.err_code
               switch (errCode) {
                 case '100':
                   this.$notify.error({
@@ -84,12 +86,12 @@ export default {
                     message: '密码错误'
                   })
                   break
-                case '102':
-                  this.$notify.error({
-                    title: '错误',
-                    message: '服务器发生错误，请重试'
-                  })
-                  break
+                // case '102':
+                //   this.$notify.error({
+                //     title: '错误',
+                //     message: '服务器发生错误，请重试'
+                //   })
+                  // break
               }
             }
           })

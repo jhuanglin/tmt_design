@@ -9,7 +9,7 @@
       <div class="search">
         <el-date-picker v-if="type === 'time'" :editable="false" class="date_search" v-model="listDate" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd" size="small" @change="listDateSearch"></el-date-picker>
         <el-select v-else v-model="searchLabel" placeholder="请选择" >
-          <el-option v-for="item in labelOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+          <el-option v-for="item in labelOptions" :key="item.value" :label="item.label" :value="item.label"></el-option>
         </el-select>
       </div>
       <div class="list_main">
@@ -98,7 +98,7 @@ export default {
     return {
       type: 'time',
       list: [],
-      comList: [],
+      comList: {},
       listDate: '',
       disabled: [],
       addListDate: [],
@@ -125,37 +125,54 @@ export default {
       // 标签
       labelOptions: [
         {
-          value: '全部',
+          value: '1',
           label: '全部'
         }, {
-          value: '学习',
+          value: '2',
           label: '学习'
         }, {
-          value: '工作',
+          value: '3',
           label: '工作'
         }, {
-          value: '生活',
+          value: '4',
           label: '生活'
         }, {
-          value: '读书',
+          value: '5',
           label: '读书'
         }, {
-          value: '运动',
+          value: '6',
           label: '运动'
         }, {
-          value: '其他',
+          value: '7',
           label: '其他'
         }
       ],
-      searchLabel: '全部',
+      searchLabel: 1,
       itemHover: -1,
       listItemHover: -1
     }
   },
   created () {
+    this.reqLabel()
     this.reqListData()
+    this.$eventBus.$on('delCompleteList', () => {
+      this.reqListData()
+    })
   },
   methods: {
+    reqLabel () {
+      this.$http({
+        method: 'post',
+        url: '/api/label'
+      }).then((res) => {
+        if (res.data.status === true) {
+          this.labelOptions = res.data.label
+          if (this.labelOptions.length !== 0) {
+            this.searchLabel = this.labelOptions[0].label
+          }
+        }
+      })
+    },
     reqListData () {
       // 不需要发送数据
       this.$http({
@@ -255,19 +272,23 @@ export default {
      * @POST {start_time||end_time} Object 查询开始时间|结束时间
      * @GET {list} Object 返回来的清单数据
      */
-    listDateSearch () {
-      this.$http({
-        method: 'post',
-        url: '/api/list/search_date',
-        data: {
-          start_time: this.listDate[0],
-          end_time: this.listDate[1]
-        }
-      }).then((res) => {
-        if (res.data.status === true) {
-          this.list = res.data.list
-        }
-      })
+    listDateSearch (val) {
+      if (val) {
+        this.$http({
+          method: 'post',
+          url: '/api/list/search_date',
+          data: {
+            start_time: this.listDate[0],
+            end_time: this.listDate[1]
+          }
+        }).then((res) => {
+          if (res.data.status === true) {
+            this.list = res.data.list
+          }
+        })
+      } else {
+        this.reqListData()
+      }
     },
     // 展示删除提示框
     showDelDia (delId) {
@@ -306,7 +327,6 @@ export default {
     },
     confirmCompleList () {
       var list = this.comList
-      // var listId = this.completeId
       this.$http({
         method: 'POST',
         url: '/api/list/complete',
@@ -318,14 +338,9 @@ export default {
             type: 'success'
           })
           this.reqListData()
+          this.addToTick({})
           this.closeComDia()
-          // for (let i = 0, len = list.length; i < len; i++) {
-          //   if (listId === list[i].list_id) {
-          //     this.list.splice(i, 1)
-          //     this.closeComDia()
-          //     break
-          //   }
-          // }
+          this.$eventBus.$emit('reloadCountData')
         } else {
           this.$message({
             message: '服务器发生错误~请重试',

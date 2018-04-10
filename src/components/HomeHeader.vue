@@ -42,6 +42,8 @@
 </template>
 
 <script>
+import md5 from 'md5'
+
 export default {
   data () {
     var validateOldPass = (rule, value, callback) => {
@@ -52,7 +54,7 @@ export default {
           method: 'POST',
           url: '/api/user/confirmpass',
           data: {
-            password: value
+            password: md5(value)
           }
         }).then((res) => {
           if (res.data.status === true) {
@@ -124,8 +126,15 @@ export default {
     },
     // 删除Storage，返回登陆页面
     backLogin () {
-      localStorage.clear()
-      this.toLogin()
+      this.$http({
+        url: '/api/logout',
+        method: 'POST'
+      }).then((res) => {
+        if (res.data.status === true) {
+          localStorage.clear()
+          this.toLogin()
+        }
+      })
     },
     // 关闭修改对话框
     closeConfig () {
@@ -140,7 +149,7 @@ export default {
             method: 'POST',
             url: '/api/user/changepass',
             data: {
-              newpass: this.configPass.newPass
+              newpass: md5(this.configPass.newPass)
             }
           }).then((res) => {
             if (res.data.status === true) {

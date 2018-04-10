@@ -2,7 +2,7 @@ const Mock = require('mockjs')
 
 // login.err_code 100为无误 101 账号不存在 102 密码错误 103 服务器错误
 // register.err_code  100为无误 101为 账号已被注册 102 服务器错误
-// register.err_code 100 为无误 101为服务器错误 
+// register.err_code 100 为无误 101为服务器错误
 const mockData = {
   // 登陆请求
   login: Mock.mock({
@@ -40,7 +40,7 @@ const mockData = {
       {
         'list_id|+1': 1,
         'title': '这是一个任务清单',
-        'start_time|1':  ['2018-3-17', '2018-3-12', '2018-2-12', '2017-11-8', '2016-10-8'],
+        'start_time|1': ['2018-3-17', '2018-3-12', '2018-2-12', '2017-11-8', '2016-10-8'],
         'end_time|1': ['2018-3-17', '2018-3-12', '2018-2-12', '2017-11-8', '2016-10-8'],
         'start_date': '',
         'end_date': '',
@@ -112,16 +112,17 @@ const mockData = {
     // 101服务器内部错误
     'err_code': 101
   }),
-  // 添加今日统计分钟数  
+  // 添加今日统计分钟数
   addCountMins: Mock.mock({
     'status': true,
     // 101服务器内部错误
     'err_code': 101
   }),
-  // 返回今日统计分钟数  
+  // 返回今日统计分钟数
   countMins: Mock.mock({
     'status': true,
-    'countMins': 40
+    "count_mins": 40,
+    "err_code": 1
   }),
   // 返回折线图数据--每天的番茄数
   countLineChart: Mock.mock({
@@ -139,11 +140,11 @@ const mockData = {
     'data': {
       'legend': ['工作', '学习', '生活', '运动', '其他'],
       'data': [
-        {value:11, name:'工作'},
-        {value:14, name:'学习'},
-        {value:1, name:'生活'},
-        {value:70, name:'运动'},
-        {value:18, name:'其他'}
+        {value: 11, name: '工作'},
+        {value: 14, name: '学习'},
+        {value: 1, name: '生活'},
+        {value: 70, name: '运动'},
+        {value: 18, name: '其他'}
       ]
     },
     'err_code': 101
@@ -154,8 +155,8 @@ const mockData = {
     'data': {
       'xdata': ['周日', '周一', '周二', '周三', '周四', '周五', '周六'],
       'ydata': [1, 2, 1.1, 2, 5, 2, 1],
-      'bestday': '周四',
-      'bestdate': '9:00-11:00'
+      'bestday': ['周四'],
+      'bestdate': [9]
     },
     'err_code': 101
   }),
@@ -178,11 +179,11 @@ const mockData = {
     ],
     'err_code': 101
   }),
-  // 接收到添加的番茄数据--主要是添加总结
-  addPromo: Mock.mock({
-    'status': true,
-    'err_code': 101
-  }),
+  // // 接收到添加的番茄数据--主要是添加总结
+  // addPromo: Mock.mock({
+  //   'status': true,
+  //   'err_code': 101
+  // }),
   delPromo: Mock.mock({
     'status': true,
     'err_code': 101
@@ -200,7 +201,7 @@ const mockData = {
     'data|3-10': [
       {
         'list_id|+1': 1,
-        'title' : '完成一个任务',
+        'title': '完成一个任务',
         'label|1': ['工作', '学习', '生活', '运动'],
         'summary|1': ['很开心', ''],
         'start_time|1': ['2018-3-17', '2018-3-12', '2018-2-12', '2017-11-8', '2016-10-8'],
@@ -220,8 +221,15 @@ const mockData = {
   changeCompleteList: Mock.mock({
     'status': true,
     'err_code': 101
+  }),
+  countData: Mock.mock({
+    'status': true,
+    'data': {
+      "historyCountMins": 100,
+      "historyCountPromos": 11,
+      "historyCountList": 10
+    },
+    'err_code': 1
   })
 }
-
-
 module.exports = mockData

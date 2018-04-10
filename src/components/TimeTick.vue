@@ -1,7 +1,7 @@
 <template>
   <div class="box tick_view">
     <div class="tick_header">
-      <el-input @clear="clearLists" v-model="showList.title" :clearable="inputClearable" placeholder="请从左侧添加新的任务" :readonly="true" prefix-icon="el-icon-plus"></el-input>
+      <el-input class="header_input" @clear="clearLists" v-model="showList.title" :clearable="inputClearable" placeholder="请从左侧添加新的任务" :readonly="true" prefix-icon="el-icon-plus"></el-input>
       <el-button class="time_bigin_button" type="danger" @click="resetTime">{{ button }}</el-button>
     </div>
     <div class="tick_content" @mouseleave="closeQuickButton">
@@ -29,6 +29,9 @@ export default {
     list: {
       type: Object,
       default: null
+    },
+    initialConfig: {
+      type: Object
     }
   },
   data () {
@@ -52,61 +55,26 @@ export default {
       showList: this.list,
       useNotification: true,
       autoFocus: false,
-      autoRelax: false,
+      autoRelax: false
     }
   },
-  created () {
-    this.getInitialConfig()
-    this.setTime()
+  mounted () {
+    // this.getInitialConfig()
+    // this.setTime()
     this.getCountTime()
   },
   methods: {
     // 获取初始化配置
-    getInitialConfig () {
-      this.$http({
-        method: 'POST',
-        url: '/api/config'
-      }).then((res) => {
-        if (res.data.status === true) {
-          var configInfo = res.data.data
-          this.workMin = configInfo.focus_mins
-          this.relaxMin = configInfo.relax_mins
-          this.userNotification = configInfo.use_notification
-          this.autoFocus = configInfo.auto_focus
-          this.autoRelax = configInfo.auto_relax
-        } else {
-          this.$message({
-            message: '初始化时间失败，请重新刷新页面',
-            type: 'warning'
-          })
-          // 请求不成功，过500毫秒后继续请求
-          // setTimeout(this.getInitialConfig, 500)
-        }
-      }).then(() => {
-        this.setTime()
-        this.setNotification()
-      })
-    },
+    // getInitialConfig () {},
     // 获取初始化分钟
     getCountTime () {
-      // this.$http({
-      //   method: 'POST',
-      //   url: '/api/time/initial'
-      // }).then((res) => {
-      //   if (res.data.result === true) {
-      //     this.workMin = res.data.data.workMin
-      //     this.relaxMin = res.data.data.relaxMin
-      //   }
-      // }).then(() => {
-      //   this.setTime()
-      // })
       // 同步今日所做时间
       this.$http({
         method: 'GET',
         url: '/api/time/count'
       }).then((res) => {
-        if (res.data.result === true) {
-          this.countMins = res.data.countMins
+        if (res.data.status === true) {
+          this.countMins = res.data.count_mins
         }
       })
     },
@@ -125,9 +93,6 @@ export default {
           })
         } else {
           var startDate = Date.now()
-          // listLd = this.showList.list_id,
-          // title = this.showList.title,
-          // label = this.showList.label
           this.showList = Object.assign(this.showList, {
             'start_date': startDate
           })
@@ -164,8 +129,13 @@ export default {
           'end_date': endDate
         })
         this.postPromoData()
+        this.getCountMins()
+        this.postCountMins()
         this.timer = setInterval(this.countTime, 1000)
         this.type = 'relax'
+        setTimeout(function () {
+          this.$eventBus.$emit('reloadCountData')
+        }, 2000)
       }
     },
     // 计算时间
@@ -184,26 +154,29 @@ export default {
         clearInterval(this.timer)
         // 显示桌面通知
         this.showNotification()
-        this.getCountMins()
         // 计时取消 -> 开始休息 || 取消计时 -> 开始番茄
         // doing -> notrelax || relax -> notstart
         this.type = this.type === 'doing' ? 'notrelax' : 'notstart'
         this.setTime()
-        if ((this.type === 'notrelax' && this.autoRelax) ||(this.type === 'notstart' && this.autoFocus)) {
+        if ((this.type === 'notrelax' && this.autoRelax) || (this.type === 'notstart' && this.autoFocus)) {
           this.resetTime()
         }
       }
     },
     // 重置时间
-    setTime (min, s) {
+    setTime (setTime) {
+      let type = this.type
+      if (!setTime && (type !== 'notstart' || type !== 'notrelax')) {
+        return
+      }
       // 开始番茄的时间设置
-      if (this.type === 'notstart') {
-        this.min = this.workMin === 0 ? 0 : this.workMin
+      if (type === 'notstart') {
+        this.min = this.workMin
         this.s = 0
       } else
       // 开始休息的时间设置
-      if (this.type === 'notrelax') {
-        this.min = this.relaxMin === 0 ? 0 : this.relaxMin
+      if (type === 'notrelax') {
+        this.min = this.relaxMin
         this.s = 0
       }
       this.min < 10 && (this.min = '0' + this.min)
@@ -223,7 +196,7 @@ export default {
     },
     // 判断是否有Notification API
     setNotification () {
-      if (window.Notification && this.use_notification) {
+      if (window.Notification && this.useNotification) {
         Notification.requestPermission().then((permission) => {
           this.notiPermission = permission
         })
@@ -233,7 +206,7 @@ export default {
     },
     // 显示桌面通知
     showNotification () {
-      if (this.notiPermission === 'granted' && this.use_notification) {
+      if (this.notiPermission === 'granted' && this.useNotification) {
         if (this.type === 'doing') {
           this.notification = this.newNotification('番茄熟了', '可以休息了~(●' + '◡' + '●)')
         } else if (this.type === 'relax') {
@@ -311,21 +284,23 @@ export default {
         this.countEnd = Date.now()
         var times = this.countEnd - this.countStart
         console.log('刚已完成时间' + times)
-        // this.countMins += Math.round(times / 1000 / 60)
-        this.countMins += Math.round(times / 60)
+        this.countMins += Math.round(times / 1000 / 60)
+        // this.countMins += Math.round(times / 60)
       }
     },
     // 发送今日统计数据
     postCountMins () {
+      console.log(1)
       if (this.countMins !== 0) {
         this.$http({
           method: 'POST',
-          url: '/api/time/count',
+          url: '/api/time/addcount',
           data: {
             countMins: this.countMins
           }
         }).then((res) => {
           if (res.data.status === true) {
+            // this.countMins = res.data.count_mins
           }
         })
       }
@@ -366,6 +341,15 @@ export default {
     },
     list (val) {
       this.showList = val
+    },
+    initialConfig (val) {
+      this.workMin = val.focus_mins
+      this.relaxMin = val.relax_mins
+      this.useNotification = val.use_notification
+      this.autoFocus = val.auto_focus
+      this.autoRelax = val.auto_relax
+      this.setTime(true)
+      this.setNotification()
     }
   },
   computed: {
@@ -397,6 +381,11 @@ export default {
 .tick_view{
   .tick_header{
     display: flex;
+    .header_input{
+      font-weight: bold;
+      font-size: 19px;
+      color: #f3be44;
+    }
     .time_bigin_button{
       margin-left: 10px;
     }

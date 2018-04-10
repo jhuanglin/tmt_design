@@ -105,12 +105,12 @@ const devWebpackConfig = merge(baseWebpackConfig, {
           mockData.addTimeQuit
         )
       }),
-      app.post('/api/promo/add', (req, res) => {
-        res.json(
-          mockData.addPromo
-        )
-      }),
-      app.post('/api/time/count', (req, res) => {
+      // app.post('/api/promo/add', (req, res) => {
+      //   res.json(
+      //     mockData.addPromo
+      //   )
+      // }),
+      app.post('/api/time/addcount', (req, res) => {
         res.json(
           mockData.addCountMins
         )
@@ -120,6 +120,11 @@ const devWebpackConfig = merge(baseWebpackConfig, {
           mockData.countMins
         )
       }),
+      app.post('/api/count/data', (req, res) => {
+        res.json(
+          mockData.countData
+        )
+      })
       app.post('/api/count/linechart', (req, res) => {
         res.json(
           mockData.countLineChart

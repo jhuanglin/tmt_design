@@ -77,7 +77,7 @@ export default {
           },
           tooltip: {
             trigger: 'item',
-            formatter: '{a} <br/>{b} : {c}mins ({d}%)'
+            formatter: '{a} <br/>{b} : {c}个 ({d}%)'
           },
           legend: {
             orient: 'vertical',
@@ -87,9 +87,9 @@ export default {
           },
           series: [
             {
-              name: '工作时长',
+              name: '番茄个数',
               type: 'pie',
-              center: ['50%', '60%'],
+              center: ['50%', '55%'],
               data: pieData,
               label: {
                 position: 'inside'
@@ -100,12 +100,26 @@ export default {
       } else if (this.type === 'bar') {
         let xdata = []
         let ydata = []
-        var bestday = ''
-        var bestdate = ''
+        let bestday = []
+        let bestdate = []
+        let dateLen = 0
         chartData.xdata && (xdata = chartData.xdata)
         chartData.ydata && (ydata = chartData.ydata)
+        // Array
         chartData.bestday && (bestday = chartData.bestday)
+        // Array
         chartData.bestdate && (bestdate = chartData.bestdate)
+        bestday.length === 0 ? bestday = '-' : bestday = bestday.join(',')
+        dateLen = bestdate.length
+        if (dateLen === 0) {
+          bestdate = '-'
+        } else {
+          if (dateLen === 1) {
+            bestdate = bestdate[0] + ':00-' + (bestdate[0] + 1) + ':00'
+          } else {
+            bestdate = bestdate[0] + ':00-' + bestdate[dateLen - 1] + ':00'
+          }
+        }
         this.chart.setOption({
           color: ['#ECAD9E'],
           title: {
@@ -151,6 +165,8 @@ export default {
             name: '完成番茄',
             type: 'bar',
             data: ydata,
+            // 当数据为0时，依然显示
+            barMinHeight: 20,
             emphasis: {
               label: {
                 show: true,

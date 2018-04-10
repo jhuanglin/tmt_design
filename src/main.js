@@ -16,6 +16,16 @@ Vue.prototype.$echarts = echarts
 Vue.use(ElementUI)
 // 引入axios
 Vue.prototype.$http = axios
+Vue.prototype.$http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
+
+var EventBus = new Vue()
+Object.defineProperties(Vue.prototype, {
+  $eventBus: {
+    get: function () {
+      return EventBus
+    }
+  }
+})
 
 Vue.config.productionTip = false
 

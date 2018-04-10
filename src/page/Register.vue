@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import md5 from 'md5'
 import '@/assets/login_regis.scss'
 
 export default {
@@ -32,7 +33,9 @@ export default {
       if (value === '') {
         callback(new Error('请输入密码'))
       } else {
-        if (this.userInfo.passwordConfirm !== '') {
+        if (value.length < 6) {
+          callback(new Error('密码最少需要6位数'))
+        } else if (this.userInfo.passwordConfirm !== '') {
           this.$refs.userInfo.validateField('passwordConfirm')
         }
         callback()
@@ -69,11 +72,11 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.$http({
-            method: 'post',
+            method: 'POST',
             url: 'api/register',
             data: {
               username: this.userInfo.username,
-              password: this.userInfo.password
+              password: md5(this.userInfo.password)
             }
           }).then((res) => {
             if (res.data.status === true) {
@@ -87,20 +90,20 @@ export default {
                 this.$router.push('/')
               }, 2000)
             } else {
-              var errCode = res.err_code
+              var errCode = res.data.err_code
               switch (errCode) {
-                case '100':
-                  this.$notify.error({
+                case 100:
+                  this.$notify({
                     title: '错误',
-                    message: '该用户不存在'
+                    message: '该用户已存在,请重新输入'
                   })
                   break
-                case '101':
-                  this.$notify.error({
-                    title: '错误',
-                    message: '服务器发生错误，请重试'
-                  })
-                  break
+                // case '101':
+                //   this.$notify.error({
+                //     title: '错误',
+                //     message: '服务器发生错误，请重试'
+                //   })
+                //   break
               }
             }
           })

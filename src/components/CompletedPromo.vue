@@ -5,14 +5,14 @@
     </p>
     <!-- @mouseenter="mouseHover(index)"  -->
     <!-- @mouseleave="mouseHover()"  -->
-    <div class="promo_list" v-for="(list, index) in promoList" :key="index" >
+    <div class="promo_list" @mouseenter="mouseHover(index)" @mouseleave="mouseHover()" v-for="(list, index) in promoList" :key="index" >
         <div class="list_date">{{ list.start_date }} - {{ list.end_date }}</div>
         <div class="list_contanier">
           <div class="list_content">
             <p>{{ list.title }}</p>
             <p v-if="list.summary !== ''" class="list_summary">总结:{{ list.summary }}</p>
           </div>
-          <i class="el-icon-close" @click="delList(list)"></i>
+          <i :class="[{show_icon: listHover == index}, 'el-icon-close']" @click="delList(list)"></i>
           <!-- <i :class="[{show_icon: listHover == index}, 'el-icon-edit-outline']" @click="openEdit(list)"></i> -->
         </div>
     </div>
@@ -86,6 +86,9 @@ export default {
     },
     delList (list) {
       var listId = list.list_id
+      var startDate = list.start_date
+      var endDate = list.end_date
+      var day = this.promoData.date
       this.$confirm('此操作将永久删除该任务清空', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -95,7 +98,10 @@ export default {
           method: 'POST',
           url: '/api/promo/del',
           data: {
-            list_id: listId
+            list_id: listId,
+            start_date: startDate,
+            end_date: endDate,
+            day: day
           }
         }).then((res) => {
           if (res.data.status === true) {
@@ -161,6 +167,7 @@ export default {
         i{
           cursor: pointer;
           display: none;
+          margin-right: 30px;
         }
         .show_icon{
           display: inline-block;

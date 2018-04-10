@@ -10,7 +10,7 @@
         <span>所花番茄数：<span class="content_value">{{ listData.tmt_counts }}</span></span>
       </p>
       <p>
-        <span>完成状态：<span class="content_value">{{ listData.status }}</span></span>
+        <!-- <span>完成状态：<span class="content_value">{{ listData.status }}</span></span> -->
       </p>
       <p v-if="listData.summary !== ''" class="list_summary">总结: <span class="content_value">{{ listData.summary }}</span></p>
     </div>
@@ -79,7 +79,7 @@ export default {
             message: '删除成功',
             type: 'success'
           })
-          this.$emit('reload')
+          this.$emit('reloadList')
           this.closeDiaVis = false
         } else {
           this.$message({

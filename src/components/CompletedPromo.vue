@@ -1,16 +1,18 @@
 <template>
   <div class="promo_contanier">
     <p class="promo_header">
-        {{ promoData.date }} 共完成{{ promoList.length }}个番茄
+        {{ promoData.date }}
+        <br>
+        共完成{{ promoData.promoList.length }}个番茄
     </p>
     <!-- @mouseenter="mouseHover(index)"  -->
     <!-- @mouseleave="mouseHover()"  -->
-    <div class="promo_list" @mouseenter="mouseHover(index)" @mouseleave="mouseHover()" v-for="(list, index) in promoList" :key="index" >
+    <div class="promo_list" @mouseenter="mouseHover(index)" @mouseleave="mouseHover()" v-for="(list, index) in promoData.promoList" :key="index" >
         <div class="list_date">{{ list.start_date }} - {{ list.end_date }}</div>
         <div class="list_contanier">
           <div class="list_content">
             <p>{{ list.title }}</p>
-            <p v-if="list.summary !== ''" class="list_summary">总结:{{ list.summary }}</p>
+            <!-- <p v-if="list.summary !== ''" class="list_summary">总结:{{ list.summary }}</p> -->
           </div>
           <i :class="[{show_icon: listHover == index}, 'el-icon-close']" @click="delList(list)"></i>
           <!-- <i :class="[{show_icon: listHover == index}, 'el-icon-edit-outline']" @click="openEdit(list)"></i> -->
@@ -42,7 +44,6 @@ export default {
   props: ['promoData'],
   data () {
     return {
-      promoList: this.promoData.promoList,
       editTrigger: false,
       editList: {},
       listHover: -1
@@ -128,12 +129,21 @@ export default {
       this.listHover = index
     }
   }
+  // ,
+  // computed: {
+  //   promoList: function () {
+  //      return this.promoData.promoList
+  //   }
+  // }
 }
 </script>
 
 <style lang="scss" scoped>
     .promo_contanier{
       padding: 5px 10px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: baseline;
       .promo_header{
         color: #000;
         font-weight: bold;

@@ -179,6 +179,11 @@ const devWebpackConfig = merge(baseWebpackConfig, {
         res.json(
           mockData.delCompleteList
         )
+      }),
+      app.post('/api/user/status', (req, res) => {
+        res.json(
+          mockData.userStatus
+        )
       })
     }
   },

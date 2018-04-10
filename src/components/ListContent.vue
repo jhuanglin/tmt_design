@@ -7,7 +7,7 @@
     </div>
     <div class="content_main">
       <div class="search">
-        <el-date-picker v-if="type === 'time'" :editable="false" class="date_search" v-model="listDate" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd" size="small" @change="listDateSearch"></el-date-picker>
+        <el-date-picker v-if="type === 'time'" :editable="false" class="date_search" v-model="listDate" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd" size="small" @change="listDateSearch" :picker-options="pickerOptions"></el-date-picker>
         <el-select v-else v-model="searchLabel" placeholder="请选择" >
           <el-option v-for="item in labelOptions" :key="item.value" :label="item.label" :value="item.label"></el-option>
         </el-select>
@@ -16,7 +16,7 @@
         <div v-if="formatList.length > 0" v-for="(lists, index) in formatList" :key="index">
           <!-- 时间显示 -->
           <div class="list_time clearfix" @mouseenter="listHover(index)" @mouseleave="listHover()">
-            <span>{{ lists[0].start_time }}</span>
+            <span>{{ lists[0].start_time }}<span v-if="index === 0 && haveTodayList">(今天)</span></span>
             <i :class="[lists[0].disabled ? 'el-icon-arrow-up' : 'el-icon-arrow-down', {list_time_hover: listItemHover == index},'icon', 'icon_right']" @click="showList(index)"></i>
           </div>
           <div :class="[ lists[0].disabled ? 'closed_list' : 'flex_list', 'list_detali', 'clearfix']" v-for="(list, listIndex) in lists" :key="listIndex" @mouseenter="mouseHover('' + index + listIndex)" @mouseleave="mouseHover()">
@@ -149,7 +149,18 @@ export default {
       ],
       searchLabel: 1,
       itemHover: -1,
-      listItemHover: -1
+      listItemHover: -1,
+      haveTodayList: false,
+      rightList: {},
+      pickerOptions: {
+        shortcuts: [{
+          text: '今天',
+          onClick (picker) {
+            const now = new Date()
+            picker.$emit('pick', [now, now])
+          }
+        }]
+      }
     }
   },
   created () {
@@ -157,6 +168,9 @@ export default {
     this.reqListData()
     this.$eventBus.$on('delCompleteList', () => {
       this.reqListData()
+    })
+    this.$eventBus.$on('clearShowList', () => {
+      this.rightList = {}
     })
   },
   methods: {
@@ -181,12 +195,13 @@ export default {
       }).then((res) => {
         if (res.data.status === true) {
           this.list = res.data.list
+          this.haveTodayList = res.data.have_todaylists
         }
       })
     },
     // 删除清单
     delList () {
-      var list = this.list
+      // var list = this.list
       var listId = this.delId
       this.$http({
         method: 'POST',
@@ -200,13 +215,14 @@ export default {
             message: '删除成功',
             type: 'success'
           })
-          for (let i = 0, len = list.length; i < len; i++) {
-            if (listId === list[i].list_id) {
-              this.list.splice(i, 1)
-              this.dialogVisible = false
-              break
-            }
-          }
+          this.dialogVisible = false
+          this.reqListData()
+          // for (let i = 0, len = list.length; i < len; i++) {
+          //   if (listId === list[i].list_id) {
+          //     this.list.splice(i, 1)
+          //     break
+          //   }
+          // }
         } else {
           this.$message({
             message: '删除失败，请重试(●' + '◡' + '●)',
@@ -218,6 +234,7 @@ export default {
     },
     // 将当前清单发送到timetick模块
     addToTick (list) {
+      this.rightList = JSON.parse(JSON.stringify(list))
       this.$emit('listen', list)
     },
     confirmAdd () {
@@ -292,10 +309,24 @@ export default {
     },
     // 展示删除提示框
     showDelDia (delId) {
+      var rList = this.rightList
+      if (rList.list_id && rList.list_id === delId) {
+        this.$alert('请先将该任务从右侧移除再进行操作', '提示', {
+          confirmButtonText: '确定'
+        })
+        return
+      }
       this.delId = delId
       this.dialogVisible = true
     },
     showCompleteDia (list, comId) {
+      var rList = this.rightList
+      if (rList.list_id && rList.list_id === comId) {
+        this.$alert('请先将该任务从右侧移除再进行操作', '提示', {
+          confirmButtonText: '确定'
+        })
+        return
+      }
       this.completeId = comId
       this.comList = Object.assign({}, list)
       this.comDialogVis = true

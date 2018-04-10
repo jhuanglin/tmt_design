@@ -12,7 +12,13 @@
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item>
+              <span @click="showUserStatus">昨日数据</span>
+            </el-dropdown-item>
+            <el-dropdown-item>
               <span @click="changePass">修改密码</span>
+            </el-dropdown-item>
+            <el-dropdown-item>
+              <span @click="showPromoIntro">关于番茄</span>
             </el-dropdown-item>
             <el-dropdown-item>
               <span @click="backLogin">退出登陆</span>
@@ -168,8 +174,16 @@ export default {
         }
       })
     },
+    // 点击修改密码
     changePass () {
       this.dialogVis = true
+    },
+    // 点击昨日数据
+    showUserStatus () {
+      this.$emit('showStatus')
+    },
+    showPromoIntro () {
+      this.$emit('showItr')
     }
   }
 }

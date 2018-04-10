@@ -12,7 +12,7 @@
         <el-slider :max="60" v-model="configInfo.relax_long_mins" show-input></el-slider>
       </el-form-item>
       <el-form-item label="长时间间隔">
-        <el-input-number v-model="configInfo.relax_long_count" :min="1" :max="10"></el-input-number>
+        <el-input-number v-model="configInfo.relax_long_count" :min="2" :max="10"></el-input-number>
       </el-form-item>
       <p class="form_group">偏好设置</p>
       <el-form-item label="自动专注" class="form_item_inline">

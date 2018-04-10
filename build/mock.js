@@ -36,6 +36,7 @@ const mockData = {
   // list已经按照start_time排序
   list: Mock.mock({
     'status': true,
+    'have_todaylists': true,
     'list|10': [
       {
         'list_id|+1': 1,
@@ -206,10 +207,12 @@ const mockData = {
         'summary|1': ['很开心', ''],
         'start_time|1': ['2018-3-17', '2018-3-12', '2018-2-12', '2017-11-8', '2016-10-8'],
         'end_time|1': ['2018-3-17', '2018-3-12', '2018-2-12', '2017-11-8', '2016-10-8'],
+        'plane_start_time|1':  ['2018-3-17', '2018-3-12', '2018-2-12', '2017-11-8', '2016-10-8'],
+        'plane_end_time|1':  ['2018-3-17', '2018-3-12', '2018-2-12', '2017-11-8', '2016-10-8'],
         'tmt_counts|4-5': 4,
         'complete': true,
         'complete_counts': 3,
-        'status|1': ['良好', '优秀', '低下']
+        'status|1': [0,1,2]
       }
     ],
     'err_code': 101
@@ -228,6 +231,27 @@ const mockData = {
       "historyCountMins": 100,
       "historyCountPromos": 11,
       "historyCountList": 10
+    },
+    'err_code': 1
+  }),
+  userStatus: Mock.mock({
+    'status': true,
+    'isShow': true,
+    'data': {
+      'count_promo': 1,
+      'count_list': 1,
+      'count_mins': 20,
+      'count_label': [
+        {value: 10, name: '工作'},
+        {value: 14, name: '学习'}
+      ],
+      'promo_list|3': [
+        {
+          'title': "完成了一个任务",
+          'start_time': '9:00',
+          'end_time': '10:00'
+        }
+      ]
     },
     'err_code': 1
   })

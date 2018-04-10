@@ -55,7 +55,10 @@ export default {
       showList: this.list,
       useNotification: true,
       autoFocus: false,
-      autoRelax: false
+      autoRelax: false,
+      longRelaxCount: 0,
+      longRelaxMins: 0,
+      promoCount: 0
     }
   },
   mounted () {
@@ -133,7 +136,7 @@ export default {
         this.postCountMins()
         this.timer = setInterval(this.countTime, 1000)
         this.type = 'relax'
-        setTimeout(function () {
+        setTimeout(() => {
           this.$eventBus.$emit('reloadCountData')
         }, 2000)
       }
@@ -154,6 +157,10 @@ export default {
         clearInterval(this.timer)
         // 显示桌面通知
         this.showNotification()
+        // 工作计时结束，完成番茄数+1
+        if (this.type === 'doing') {
+          this.promoCount += 1
+        }
         // 计时取消 -> 开始休息 || 取消计时 -> 开始番茄
         // doing -> notrelax || relax -> notstart
         this.type = this.type === 'doing' ? 'notrelax' : 'notstart'
@@ -166,7 +173,7 @@ export default {
     // 重置时间
     setTime (setTime) {
       let type = this.type
-      if (!setTime && (type !== 'notstart' || type !== 'notrelax')) {
+      if (setTime && (this.type === 'doing' || this.type === 'relax')) {
         return
       }
       // 开始番茄的时间设置
@@ -176,7 +183,13 @@ export default {
       } else
       // 开始休息的时间设置
       if (type === 'notrelax') {
-        this.min = this.relaxMin
+        // 如果达到了最长计时间隔
+        if (this.promoCount === this.longRelaxCount) {
+          this.min = this.longRelaxMins
+          this.promoCount = 0
+        } else {
+          this.min = this.relaxMin
+        }
         this.s = 0
       }
       this.min < 10 && (this.min = '0' + this.min)
@@ -248,6 +261,7 @@ export default {
     },
     // 清空List
     clearLists () {
+      this.$eventBus.$emit('clearShowList')
       this.showList = {}
       // this.$emit('clearlist')
     },
@@ -290,7 +304,6 @@ export default {
     },
     // 发送今日统计数据
     postCountMins () {
-      console.log(1)
       if (this.countMins !== 0) {
         this.$http({
           method: 'POST',
@@ -348,6 +361,8 @@ export default {
       this.useNotification = val.use_notification
       this.autoFocus = val.auto_focus
       this.autoRelax = val.auto_relax
+      this.longRelaxCount = val.relax_long_count
+      this.longRelaxMins = val.relax_long_mins
       this.setTime(true)
       this.setNotification()
     }

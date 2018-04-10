@@ -4,13 +4,15 @@
       [{{listData.label}}] {{ listData.title }}
     </p>
     <div class="list_content">
-      <p>完成时间：<span class="content_value">{{ listData.start_time }} - {{ listData.end_time }}</span></p>
+      <p>预计完成时间：<span class="content_value">{{ listData.start_time }} - {{ listData.end_time }}</span></p>
+      <p>实际完成时间：<span class="content_value">{{ listData.start_time }} - {{ listData.end_time }}</span></p>
       <p>
         <span style="margin-right: 60px">预计番茄数：<span class="content_value">{{ listData.tmt_counts }}</span></span>
         <span>所花番茄数：<span class="content_value">{{ listData.tmt_counts }}</span></span>
       </p>
       <p>
-        <!-- <span>完成状态：<span class="content_value">{{ listData.status }}</span></span> -->
+        <!-- <span>完成状态：<span :class="'content_status', 'status_' + listData.status">{{ statuOptions[listData.status] }}</span></span> -->
+        <span>完成状态：<span class="content_value status_">{{ listData.status }}</span></span>
       </p>
       <p v-if="listData.summary !== ''" class="list_summary">总结: <span class="content_value">{{ listData.summary }}</span></p>
     </div>
@@ -54,7 +56,8 @@ export default {
       closeDiaVis: false,
       editDiaVis: false,
       editList: {},
-      showIcon: false
+      showIcon: false,
+      statuOptions: ['尚需努力~fighting!', '一切都在计划中~(●' + '◡' + '●)', '超前完成!棒!!']
     }
   },
   methods: {
@@ -140,9 +143,12 @@ export default {
   padding: 10px;
   .list_header{
     color: #000;
+    width: 20%;
+    max-width: 200px;
     font-weight: bold;
   }
   .content_value{
+    font-weight: bold;
     color: #000;
   }
   .list_content{
@@ -155,6 +161,18 @@ export default {
   }
   .list_icon{
     display: none;
+  }
+  .content_status{
+    font-weight: bold;
+  }
+  .status_2{
+    color:#75d250;
+  }
+  .status_1{
+    color: #ECAD9E;
+  }
+  .status_0{
+    color: #19CAAD;
   }
 }
 </style>

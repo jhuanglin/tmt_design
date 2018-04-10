@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-      <home-header @listen="openConfig"></home-header>
+      <home-header @listen="openConfig" @showStatus="showStatus" @showItr="showItrDia"></home-header>
       <div class="content">
         <el-row type="flex" justify="space-between" :gutter="10">
           <el-col :span="7">
@@ -13,6 +13,8 @@
         </el-row>
       </div>
       <config-info :configTrigger="configTrigger" :initialConfig="initialConfig" @closeConfig="closeConfig" @confirmConfig="confirmConfig"></config-info>
+      <user-status :dialogVisible="showUserStatus" :userStatus="userStatus"  @closeDialog="closeDia"></user-status>
+      <promo-intro :dialogVisible="showPromoIntro" @closeItrDia="closeItrDia"></promo-intro>
   </div>
 </template>
 
@@ -22,16 +24,22 @@ import listContent from '@/components/ListContent'
 import configInfo from '@/components/ConfigInfo'
 import countBack from '@/components/CountBack'
 import timeTick from '@/components/TimeTick'
+import userStatus from '@/components/UserStatus'
+import promoIntro from '@/components/PromoIntro'
 
 export default {
   data () {
     return {
       configTrigger: false,
       initialConfig: {},
-      list: {}
+      list: {},
+      showUserStatus: false,
+      userStatus: {},
+      showPromoIntro: false
     }
   },
   created () {
+    this.getUserStatus()
     this.getInitialConfig()
   },
   methods: {
@@ -41,6 +49,34 @@ export default {
     closeConfig () {
       this.configTrigger = false
     },
+    closeDia () {
+      this.showUserStatus = false
+    },
+    showStatus () {
+      this.showUserStatus = true
+    },
+    closeItrDia () {
+      this.showPromoIntro = false
+    },
+    showItrDia () {
+      this.showPromoIntro = true
+    },
+    getUserStatus () {
+      this.$http({
+        method: 'POST',
+        url: '/api/user/status'
+      }).then((res) => {
+        if (res.data.status === true) {
+          this.showUserStatus = res.data.isShow
+          this.userStatus = res.data.data
+        } else {
+          this.$message({
+            message: '初始化时间失败，请重新刷新页面',
+            type: 'warning'
+          })
+        }
+      })
+    },
     getInitialConfig () {
       this.$http({
         method: 'POST',
@@ -48,11 +84,6 @@ export default {
       }).then((res) => {
         if (res.data.status === true) {
           this.initialConfig = res.data.data
-        } else {
-          this.$message({
-            message: '初始化时间失败，请重新刷新页面',
-            type: 'warning'
-          })
         }
       })
     },
@@ -91,7 +122,9 @@ export default {
     listContent, // 左侧列表
     configInfo, // 个人设置
     countBack, // chart图表显示
-    timeTick // 计时
+    timeTick, // 计时
+    userStatus, // 用户的状态
+    promoIntro // 番茄的用法说明
   }
 }
 </script>

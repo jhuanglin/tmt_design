@@ -7,16 +7,18 @@
     </p>
     <!-- @mouseenter="mouseHover(index)"  -->
     <!-- @mouseleave="mouseHover()"  -->
-    <div class="promo_list" @mouseenter="mouseHover(index)" @mouseleave="mouseHover()" v-for="(list, index) in promoData.promoList" :key="index" >
-        <div class="list_date">{{ list.start_date }} - {{ list.end_date }}</div>
-        <div class="list_contanier">
-          <div class="list_content">
-            <p>{{ list.title }}</p>
-            <!-- <p v-if="list.summary !== ''" class="list_summary">总结:{{ list.summary }}</p> -->
+    <div class="promo_lists">
+      <div class="promo_list" @mouseenter="mouseHover(index)" @mouseleave="mouseHover()" v-for="(list, index) in promoData.promoList" :key="index" >
+          <div class="list_date">{{ list.start_date }} - {{ list.end_date }}</div>
+          <div class="list_contanier">
+            <div class="list_content">
+              <p>{{ list.title }}</p>
+              <!-- <p v-if="list.summary !== ''" class="list_summary">总结:{{ list.summary }}</p> -->
+            </div>
+            <i :class="[{show_icon: listHover == index}, 'el-icon-close']" @click="delList(list)"></i>
+            <!-- <i :class="[{show_icon: listHover == index}, 'el-icon-edit-outline']" @click="openEdit(list)"></i> -->
           </div>
-          <i :class="[{show_icon: listHover == index}, 'el-icon-close']" @click="delList(list)"></i>
-          <!-- <i :class="[{show_icon: listHover == index}, 'el-icon-edit-outline']" @click="openEdit(list)"></i> -->
-        </div>
+      </div>
     </div>
     <!-- <el-dialog title="添加TMT配置" :visible.sync="editTrigger">
         <el-form :model="editList" label-width="100px">
@@ -145,9 +147,14 @@ export default {
       justify-content: flex-start;
       align-items: baseline;
       .promo_header{
+        max-width: 200px;
+        width: 20%;
         color: #000;
         font-weight: bold;
         margin: 10px 0;
+      }
+      .promo_lists{
+        flex-grow: 1;
       }
       .promo_list{
         display: flex;

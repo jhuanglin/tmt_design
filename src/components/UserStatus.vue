@@ -1,6 +1,6 @@
 <template>
-    <el-dialog class="user_status" title="TMT历史记录" :visible.sync="dialogVisible" @close="closeDia">
-      <p class="dia_intro">嘿嘿~以下是阁下的昨日数据，今日也请好好努力哦~</p>
+    <el-dialog class="user_status" title="TMT历史记录" :visible.sync="diaVis" @close="closeDia" width="35%">
+      <p class="dia_intro">嘿嘿,以下是你的昨日数据，今日也请好好努力哦(ง •̀_•́)ง~</p>
       <div class="dia_content">
         <div class="content_line">
           <div class="line_box line_left">
@@ -19,11 +19,11 @@
           </div>
           <div class="line_box line_right">
             <p v-if="userStatus.count_label.length === 0">暂无标签数据</p>
-            <div v-else ref="lineChart"></div>
+            <div ref="lineChart" class="line_chart"></div>
           </div>
         </div>
         <div class="content_promo">
-          <p class="promo_list">番茄历史</p>
+          <p class="promo_list">{{ userStatus.date }}番茄历史</p>
           <p v-if="userStatus.promo_list.length === 0" class="promo_list">暂无数据</p>
           <p v-else v-for="(list, index) in userStatus.promo_list" :key="index"  class="promo_list">
             <span>{{ list.start_time }} - {{ list.end_time }} </span>
@@ -40,22 +40,38 @@
 <script>
 export default {
   props: ['dialogVisible', 'userStatus'],
-  mounted () {
-    this.initPieChart()
+  data () {
+    return {
+      diaVis: this.dialogVisible
+    }
   },
-  method: {
+  mounted () {
+    this.$nextTick(() => {
+      this.initPieChart()
+    })
+  },
+  methods: {
     initPieChart () {
-      let chart = this.$echarts.init(this.$refs['lineChart'])
+      console.log(1)
+      var chart = this.$echarts.init(this.$refs['lineChart'])
       let pieData = this.userStatus.count_label
+      console.log(pieData)
       chart.setOption({
         // color: ['#ECAD9E', '#19CAAD', '#F4606C', '#E6CEAC', '#BEEDC7', '#A0EEE1', '#BEE7E9', '#8CC7B5'],
         // color: ['#EAD52A', '#B28204', '#FEB62C', '#FCC767'],
-        // color: ['#FD6766', '#FF534D', '#F84F62', '#FA1D0B'],
+        color: ['#FD6766', '#F84F62', '#FF534D', '#FA1D0B'],
         // color: ['#FFC547', '#FC8703', '#FE9A3A'],
-        color: ['#F36705', '#FDCC06', '#99A42A'],
+        // color: ['#F36705', '#FDCC06', '#99A42A'],
         title: {
           text: '标签统计',
-          x: 'center'
+          x: 'left',
+          textStyle: {
+            fontSize: '14',
+            fontWeight: 'normal'
+          }
+        },
+        legend: {
+          data: []
         },
         tooltip: {
           trigger: 'item',
@@ -78,34 +94,57 @@ export default {
     closeDia () {
       this.$emit('closeDialog')
     }
+  },
+  watch: {
+    dialogVisible (val) {
+      this.diaVis = val
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+  .dia_intro{
+    margin-top: -20px;
+  }
   .content_line{
     display: flex;
+    &:first-child{
+      border-bottom: 2px solid #ccc;
+    }
     .line_box{
+      flex-grow: 1;
+      flex-basis: 50%;
       display: flex;
       justify-content: center;
+      flex-direction: column;
       align-items: center;
-      padding: 20px;
-      height: 150px;
+      height: 90px;
     }
     .line_left{
       border-right: 2px solid #ccc;
-      border-bottom: 2px solid #ccc;
+      margin-top: 20px;
+      margin-bottom: 20px;
     }
     .line_right{
-      border-bottom: 2px solid #ccc;
+      margin-top: 20px;
     }
     .line_value{
       font-weight: bold;
       color: #ff9292;
+      font-size: 24px;
     }
-    .promo_list{
-      padding-left: 10px;
-      border-bottom: 1px solid #ccc;
+    .line_chart{
+      width: 100%;
+      height: 100%;
     }
+  }
+  .content_promo{
+    border: 1px solid #ccc;
+    border-bottom: none;
+  }
+  .promo_list{
+    padding: 2px 10px;
+    border-bottom: 1px solid #ccc;
   }
 </style>

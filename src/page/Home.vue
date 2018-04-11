@@ -13,8 +13,8 @@
         </el-row>
       </div>
       <config-info :configTrigger="configTrigger" :initialConfig="initialConfig" @closeConfig="closeConfig" @confirmConfig="confirmConfig"></config-info>
-      <user-status :dialogVisible="showUserStatus" :userStatus="userStatus"  @closeDialog="closeDia"></user-status>
-      <promo-intro :dialogVisible="showPromoIntro" @closeItrDia="closeItrDia"></promo-intro>
+      <user-status v-if="showUserStatus" :dialogVisible="showUserStatus" :userStatus="userStatus"  @closeDialog="closeDia"></user-status>
+      <promo-intro  :dialogVisible="showPromoIntro" @closeItrDia="closeItrDia"></promo-intro>
   </div>
 </template>
 
@@ -67,8 +67,13 @@ export default {
         url: '/api/user/status'
       }).then((res) => {
         if (res.data.status === true) {
-          this.showUserStatus = res.data.isShow
+          let firstIn = res.data.is_first_in
           this.userStatus = res.data.data
+          if (firstIn) {
+            this.showPromoIntro = true
+          } else {
+            this.showUserStatus = res.data.is_show
+          }
         } else {
           this.$message({
             message: '初始化时间失败，请重新刷新页面',

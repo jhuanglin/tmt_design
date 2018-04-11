@@ -236,8 +236,10 @@ const mockData = {
   }),
   userStatus: Mock.mock({
     'status': true,
-    'isShow': true,
+    'is_first_in': false,
+    'is_show': true,
     'data': {
+      'date': '2018-04-11',
       'count_promo': 1,
       'count_list': 1,
       'count_mins': 20,

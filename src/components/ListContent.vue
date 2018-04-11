@@ -61,7 +61,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="预计日期">
-          <el-date-picker :editable="false" v-model="addListDate" class="countdate_search" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd" size="small"></el-date-picker>
+          <el-date-picker :editable="false" v-model="addListDate" class="countdate_search" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd" size="small" :picker-options="pickerOptions"></el-date-picker>
         </el-form-item>
       </el-form>
       <span slot="footer">

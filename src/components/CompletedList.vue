@@ -4,7 +4,7 @@
       [{{listData.label}}] {{ listData.title }}
     </p>
     <div class="list_content">
-      <p>预计完成时间：<span class="content_value">{{ listData.start_time }} - {{ listData.end_time }}</span></p>
+      <p>预计完成时间：<span class="content_value">{{ listData.plane_start_time }} - {{ listData.plane_end_time }}</span></p>
       <p>实际完成时间：<span class="content_value">{{ listData.start_time }} - {{ listData.end_time }}</span></p>
       <p>
         <span style="margin-right: 60px">预计番茄数：<span class="content_value">{{ listData.tmt_counts }}</span></span>

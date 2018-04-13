@@ -14,7 +14,7 @@
     <div class="count_content">
       <div  v-if="type === 'historyMins'" v-loading="chartLoading" >
         <div class="chart_search">
-          <el-date-picker :editable="false" v-model="countDate" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd" size="small" @change="dateSearch" :picker-options="pickerOptions"></el-date-picker>
+          <el-date-picker id="2" :editable="false" v-model="countDate" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd" size="small" @change="dateSearch" :picker-options="pickerOptions"></el-date-picker>
         </div>
         <!-- 折线图 -->
         <chart class="count_chart_line" :chartData="chartLineData" type="line"></chart>
@@ -32,7 +32,7 @@
       </div>
       <div v-else-if="type === 'historyPromo'" v-loading="promoLoading">
         <div class="chart_search">
-          <el-date-picker :editable="false" v-model="countPromoDate" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd" size="small" @change="getPromoData" :picker-options="pickerOptions"></el-date-picker>
+          <el-date-picker id="3" :editable="false" v-model="countPromoDate" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd" size="small" @change="getPromoData" :picker-options="pickerOptions"></el-date-picker>
         </div>
         <div class="promo_content">
           <p v-if="promoShowData.length === 0" class="content_none_data">
@@ -46,7 +46,7 @@
       </div>
       <div v-else-if="type === 'historyList'" v-loading="listLoading">
         <div class="chart_search">
-          <el-date-picker :editable="false" v-model="countListDate" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd" size="small" @change="getListData" :picker-options="pickerOptions"></el-date-picker>
+          <el-date-picker id="4" :editable="false" v-model="countListDate" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd" size="small" @change="getListData" :picker-options="pickerOptions"></el-date-picker>
         </div>
         <div class="promo_content">
           <p v-if="listShowData.length === 0" class="content_none_data">

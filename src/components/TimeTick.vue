@@ -50,6 +50,7 @@ export default {
       notification: null,
       // 今日完成时间数
       countMins: 0,
+      promoMins: 0,
       countStart: 0,
       countEnd: 0,
       showList: this.list,
@@ -131,9 +132,9 @@ export default {
         this.showList = Object.assign(this.showList, {
           'end_date': endDate
         })
-        this.postPromoData()
         this.getCountMins()
         this.postCountMins()
+        this.postPromoData()
         this.timer = setInterval(this.countTime, 1000)
         this.type = 'relax'
         setTimeout(() => {
@@ -281,26 +282,32 @@ export default {
     // },
     // 发送完成的番茄
     postPromoData () {
+      let list = Object.assign({}, this.showList, {
+        'promoMins': this.promoMins
+      })
       this.$http({
         method: 'POST',
         url: '/api/promo/add',
-        data: this.showList
+        data: list
       }).then((res) => {
         // 如果发送失败则再次发送直到发送成功
-        if (res.data.status === false) {
+        if (res.data.status === true) {
+          this.promoMins = 0
           // this.postPromoData()
         }
       })
     },
     // 获取已学习时长
     getCountMins () {
-      if (this.type === 'doing') {
-        this.countEnd = Date.now()
-        var times = this.countEnd - this.countStart
-        console.log('刚已完成时间' + times)
-        this.countMins += Math.round(times / 1000 / 60)
-        // this.countMins += Math.round(times / 60)
-      }
+      // if (this.type === 'doing') {
+      this.countEnd = Date.now()
+      var times = this.countEnd - this.countStart
+      console.log('刚已完成时间' + times)
+      let promoMins = Math.round(times / 1000 / 60)
+      this.promoMins = promoMins
+      this.countMins += promoMins
+      // this.countMins += Math.round(times / 60)
+      // }
     },
     // 发送今日统计数据
     postCountMins () {

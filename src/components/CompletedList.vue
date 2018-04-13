@@ -4,16 +4,37 @@
       [{{listData.label}}] {{ listData.title }}
     </p>
     <div class="list_content">
-      <p>预计完成时间：<span class="content_value">{{ listData.plane_start_time }} - {{ listData.plane_end_time }}</span></p>
-      <p>实际完成时间：<span class="content_value">{{ listData.start_time }} - {{ listData.end_time }}</span></p>
+      <p>
+        <span style="margin-right: 30px">预计完成时间：<span class="content_value">{{ listData.plane_start_time }} - {{ listData.plane_end_time }}</span></span>
+        预计总共<span class="content_value">{{ listData.plan_days }}</span>天
+      </p>
+      <p>
+        <span style="margin-right: 30px">实际完成时间：<span class="content_value">{{ listData.start_time }} - {{ listData.end_time }}</span></span>
+        实际总共<span class="content_value">{{ listData.real_days }}</span>天
+      </p>
       <p>
         <span style="margin-right: 60px">预计番茄数：<span class="content_value">{{ listData.tmt_counts }}</span></span>
-        <span>所花番茄数：<span class="content_value">{{ listData.tmt_counts }}</span></span>
+        <span>所花番茄数：<span class="content_value">{{ listData.complete_counts }}</span></span>
       </p>
       <p>
-        <!-- <span>完成状态：<span :class="'content_status', 'status_' + listData.status">{{ statuOptions[listData.status] }}</span></span> -->
-        <span>完成状态：<span class="content_value status_">{{ listData.status }}</span></span>
+        <span v-if="promoCounts > 0">
+          --实际花费番茄超过预计
+          <span class="content_value">{{ promoCounts }}</span>
+          个--
+        </span>
+        <span v-if="promoCounts < 0">
+          --实际花费番茄提前
+          <span class="content_value">{{ Math.abs(promoCounts) }}</span>
+          个完成--
+        </span>
+        <span v-if="promoCounts === 0">
+          --在预计之内完成任务(ง •̀_•́)ง--
+        </span>
       </p>
+      <!-- <p> -->
+        <!-- <span>完成状态：<span :class="'content_status', 'status_' + listData.status">{{ statuOptions[listData.status] }}</span></span> -->
+        <!-- <span>完成状态：<span class="content_value status_">{{ listData.status }}</span></span> -->
+      <!-- </p> -->
       <p v-if="listData.summary !== ''" class="list_summary">总结: <span class="content_value">{{ listData.summary }}</span></p>
     </div>
     <div :class="[showIcon ? '' : 'list_icon']">
@@ -56,8 +77,8 @@ export default {
       closeDiaVis: false,
       editDiaVis: false,
       editList: {},
-      showIcon: false,
-      statuOptions: ['尚需努力~fighting!', '一切都在计划中~(●' + '◡' + '●)', '超前完成!棒!!']
+      showIcon: false
+      // statuOptions: ['尚需努力~fighting!', '一切都在计划中~(●' + '◡' + '●)', '超前完成!棒!!']
     }
   },
   methods: {
@@ -130,6 +151,18 @@ export default {
     },
     hideIcon () {
       this.showIcon = false
+    }
+  },
+  computed: {
+    promoCounts () {
+      let listData = this.listData
+      let item
+      if (listData.complete_counts && listData.tmt_counts) {
+        item = listData.complete_counts - listData.tmt_counts
+        return item
+      } else {
+        return 0
+      }
     }
   }
 }

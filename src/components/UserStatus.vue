@@ -52,10 +52,15 @@ export default {
   },
   methods: {
     initPieChart () {
-      console.log(1)
       var chart = this.$echarts.init(this.$refs['lineChart'])
-      let pieData = this.userStatus.count_label
-      console.log(pieData)
+      let pieData = []
+      pieData = this.userStatus.count_label
+      if (pieData.length === 0) {
+        pieData.push({
+          value: '0',
+          name: '暂无数据'
+        })
+      }
       chart.setOption({
         // color: ['#ECAD9E', '#19CAAD', '#F4606C', '#E6CEAC', '#BEEDC7', '#A0EEE1', '#BEE7E9', '#8CC7B5'],
         // color: ['#EAD52A', '#B28204', '#FEB62C', '#FCC767'],

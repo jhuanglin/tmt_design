@@ -7,7 +7,7 @@
     </div>
     <div class="content_main">
       <div class="search">
-        <el-date-picker v-if="type === 'time'" :editable="false" class="date_search" v-model="listDate" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd" size="small" @change="listDateSearch" :picker-options="pickerOptions"></el-date-picker>
+        <el-date-picker id="1" v-if="type === 'time'" :editable="false" class="date_search" v-model="listDate" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd" size="small" @change="listDateSearch" :picker-options="pickerOptions"></el-date-picker>
         <el-select v-else v-model="searchLabel" placeholder="请选择" >
           <el-option v-for="item in labelOptions" :key="item.value" :label="item.label" :value="item.label"></el-option>
         </el-select>
@@ -41,7 +41,9 @@
       </div>
     </div>
     <el-dialog title="删除TMT" :visible.sync="dialogVisible" width="30%">
-      <span>确定要删除该TMT吗/(ㄒoㄒ)/~~？</span>
+      <p>确定要删除该TMT吗/(ㄒoㄒ)/~~？</p>
+      <p>此处删除任务清单，将删除其全部历史数据，包括完成番茄历史，所花费的总计时长等等</p>
+      <p>请三思而后行哦~</p>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="delList">确 定</el-button>
@@ -61,7 +63,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="预计日期">
-          <el-date-picker :editable="false" v-model="addListDate" class="countdate_search" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd" size="small" :picker-options="pickerOptions"></el-date-picker>
+          <el-date-picker id="5" :editable="false" v-model="addListDate" class="countdate_search" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd" size="small" :picker-options="pickerOptions"></el-date-picker>
         </el-form-item>
       </el-form>
       <span slot="footer">
@@ -217,6 +219,7 @@ export default {
           })
           this.dialogVisible = false
           this.reqListData()
+          this.$eventBus.$emit('reloadCountData')
           // for (let i = 0, len = list.length; i < len; i++) {
           //   if (listId === list[i].list_id) {
           //     this.list.splice(i, 1)

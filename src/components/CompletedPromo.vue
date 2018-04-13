@@ -92,6 +92,7 @@ export default {
       var startDate = list.start_date
       var endDate = list.end_date
       var day = this.promoData.date
+      var promoId = list.id
       this.$confirm('此操作将永久删除该任务清空', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -104,7 +105,8 @@ export default {
             list_id: listId,
             start_date: startDate,
             end_date: endDate,
-            day: day
+            day: day,
+            id: promoId
           }
         }).then((res) => {
           if (res.data.status === true) {

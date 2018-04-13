@@ -61,10 +61,16 @@ export default {
           }]
         })
       } else if (this.type === 'pie') {
-        var legendData
-        var pieData
+        var legendData = []
+        var pieData = []
         chartData.legend && (legendData = chartData.legend)
         chartData.data && (pieData = chartData.data)
+        if (pieData.length === 0) {
+          pieData.push({
+            value: '0',
+            name: '暂无数据'
+          })
+        }
         this.chart.setOption({
           // color: ['#ECAD9E', '#19CAAD', '#F4606C', '#E6CEAC', '#BEEDC7', '#A0EEE1', '#BEE7E9', '#8CC7B5'],
           // color: ['#EAD52A', '#B28204', '#FEB62C', '#FCC767'],

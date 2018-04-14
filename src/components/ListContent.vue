@@ -171,6 +171,9 @@ export default {
     this.$eventBus.$on('delCompleteList', () => {
       this.reqListData()
     })
+    this.$eventBus.$on('delCompletePromo', () => {
+      this.reqListData()
+    })
     this.$eventBus.$on('clearShowList', () => {
       this.rightList = {}
     })

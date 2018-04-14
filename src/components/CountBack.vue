@@ -260,11 +260,17 @@ export default {
     // 删除之后重新加载promo
     reloadPro () {
       this.getPromoData()
-      this.getCountData()
+      setTimeout(() => {
+        this.getCountData()
+        this.$eventBus.$emit('delCompletePromo')
+      }, 2000)
     },
     reloadProList () {
       this.getListData()
-      this.$eventBus.$emit('delCompleteList')
+      setTimeout(() => {
+        this.getCountData()
+        this.$eventBus.$emit('delCompleteList')
+      }, 2000)
     },
     // 切换页面
     handleCurrentChange (val) {
